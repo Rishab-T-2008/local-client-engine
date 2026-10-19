@@ -75,38 +75,51 @@ Respond with strict JSON following this schema:
   "diplomaticReply": "string (ready-to-send copy/paste message)"
 }`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(
-      apiKey.trim()
-    )}`;
+    const models = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-1.5-flash"];
+    let geminiData: any = null;
+    let lastErrorMsg = "Gemini API error.";
 
-    const geminiRes = await fetch(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
+    for (const model of models) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+        apiKey.trim()
+      )}`;
+
+      const geminiRes = await fetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.3,
           },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.3,
-        },
-      }),
-    });
+        }),
+      });
 
-    if (!geminiRes.ok) {
+      if (geminiRes.ok) {
+        geminiData = await geminiRes.json();
+        break;
+      }
+
       const errorText = await geminiRes.text();
-      let msg = "Gemini API error.";
       try {
         const parsed = JSON.parse(errorText);
-        msg = parsed.error?.message || msg;
+        lastErrorMsg = parsed.error?.message || lastErrorMsg;
       } catch {}
-      return NextResponse.json({ error: `Gemini API error: ${msg}` }, { status: geminiRes.status });
+
+      if (geminiRes.status !== 404) {
+        return NextResponse.json({ error: `Gemini API error: ${lastErrorMsg}` }, { status: geminiRes.status });
+      }
     }
 
-    const geminiData = await geminiRes.json();
+    if (!geminiData) {
+      return NextResponse.json({ error: `Gemini API error: ${lastErrorMsg}` }, { status: 502 });
+    }
     const rawContent = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawContent) {
@@ -141,3 +154,4 @@ Respond with strict JSON following this schema:
     );
   }
 }
+
