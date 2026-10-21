@@ -75,45 +75,60 @@ Respond with strict JSON following this schema:
   "diplomaticReply": "string (ready-to-send copy/paste message)"
 }`;
 
-    const models = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-1.5-flash"];
+    // Call Gemini REST API (with gemini-3.5-flash-lite & multi-model fallback)
+    const models = [
+      "gemini-3.5-flash-lite",
+      "gemini-3-flash-preview",
+      "gemini-3.8-flash",
+      "gemini-flash-latest",
+    ];
     let geminiData: any = null;
     let lastErrorMsg = "Gemini API error.";
 
     for (const model of models) {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
-        apiKey.trim()
-      )}`;
-
-      const geminiRes = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.3,
-          },
-        }),
-      });
-
-      if (geminiRes.ok) {
-        geminiData = await geminiRes.json();
-        break;
-      }
-
-      const errorText = await geminiRes.text();
       try {
-        const parsed = JSON.parse(errorText);
-        lastErrorMsg = parsed.error?.message || lastErrorMsg;
-      } catch {}
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+          apiKey.trim()
+        )}`;
 
-      if (geminiRes.status !== 404) {
+        const geminiRes = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.3,
+            },
+          }),
+        });
+
+        if (geminiRes.ok) {
+          geminiData = await geminiRes.json();
+          break;
+        }
+
+        const errorText = await geminiRes.text();
+        try {
+          const parsed = JSON.parse(errorText);
+          lastErrorMsg = parsed.error?.message || lastErrorMsg;
+        } catch {}
+
+        // If model not found (404), overloaded (503), rate limited (429), or server error (500+), try next fallback model
+        if (geminiRes.status === 404 || geminiRes.status === 429 || geminiRes.status >= 500) {
+          continue;
+        }
+
+        // For fatal client errors (e.g. 400 invalid API key), return immediately
         return NextResponse.json({ error: `Gemini API error: ${lastErrorMsg}` }, { status: geminiRes.status });
+      } catch (fetchErr: any) {
+        lastErrorMsg = fetchErr.message || "Network error connecting to Gemini API.";
+        continue;
       }
     }
 
