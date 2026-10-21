@@ -1445,8 +1445,8 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // GET /api/whop-verify
-  if (pathname === "/api/whop-verify" && req.method === "GET") {
+  // GET /api/whop-verify or /api/dodo-verify
+  if ((pathname === "/api/whop-verify" || pathname === "/api/dodo-verify") && req.method === "GET") {
     res.writeHead(200, { "Content-Type": "application/json" });
     if (userSession && userSession.hasAccess) {
       res.end(JSON.stringify({
@@ -1454,6 +1454,7 @@ const server = http.createServer((req, res) => {
         licenseKey: userSession.licenseKey || "ACTIVE",
         tier: userSession.tier || "PRO",
         username: userSession.username || "Studio Pro Member",
+        provider: userSession.provider || "dodo",
       }));
     } else {
       res.end(JSON.stringify({ authenticated: false }));
@@ -1461,8 +1462,8 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // POST /api/whop-verify
-  if (pathname === "/api/whop-verify" && req.method === "POST") {
+  // POST /api/whop-verify or /api/dodo-verify
+  if ((pathname === "/api/whop-verify" || pathname === "/api/dodo-verify") && req.method === "POST") {
     let body = "";
     req.on("data", chunk => { body += chunk; });
     req.on("end", () => {
@@ -1471,15 +1472,25 @@ const server = http.createServer((req, res) => {
       const { licenseKey } = reqBody;
       if (!licenseKey || typeof licenseKey !== "string" || !licenseKey.trim()) {
         res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Please enter a valid Whop license key." }));
+        res.end(JSON.stringify({ success: false, error: "Please enter a valid Dodo Payments license key." }));
         return;
       }
       const trimmedKey = licenseKey.trim();
-      const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-WHOP-2026";
+      const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-DODO-2026";
       let isValid = false;
-      if (trimmedKey === "DEMO-WHOP-2026" || trimmedKey === masterPasskey) {
+      if (
+        trimmedKey === "DEMO-DODO-2026" ||
+        trimmedKey === "DEMO-WHOP-2026" ||
+        trimmedKey === masterPasskey
+      ) {
         isValid = true;
-      } else if (trimmedKey.startsWith("whop_") || trimmedKey.startsWith("pass_") || trimmedKey.length >= 12) {
+      } else if (
+        trimmedKey.startsWith("dodo_") ||
+        trimmedKey.startsWith("lic_") ||
+        trimmedKey.startsWith("whop_") ||
+        trimmedKey.startsWith("pass_") ||
+        trimmedKey.length >= 12
+      ) {
         isValid = true;
       }
       if (!isValid) {
@@ -1488,9 +1499,9 @@ const server = http.createServer((req, res) => {
         return;
       }
       const mockUser = {
-        id: `whop_${trimmedKey.slice(0, 16)}`,
-        username: trimmedKey === "DEMO-WHOP-2026" ? "Demo Agency Operator" : "Studio Pro Member",
-        email: "subscriber@whop.member",
+        id: `dodo_${trimmedKey.slice(0, 16)}`,
+        username: (trimmedKey === "DEMO-DODO-2026" || trimmedKey === "DEMO-WHOP-2026") ? "Demo Agency Operator" : "Studio Pro Member",
+        email: "subscriber@dodopayments.member",
         hasAccess: true,
         membershipPlan: "Freelance Studio OS (PRO)",
         licenseKey: trimmedKey,

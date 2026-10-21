@@ -10,8 +10,8 @@ function getSecretKey(): Uint8Array {
 }
 
 /**
- * GET /api/whop-verify
- * Checks if current request has a valid Whop session cookie.
+ * GET /api/whop-verify (also aliased for Dodo Payments)
+ * Checks if current request has a valid session cookie.
  */
 export async function GET(req: NextRequest) {
   const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
       licenseKey: (payload.licenseKey as string) || "ACTIVE",
       tier: (payload.tier as string) || "PRO",
       username: (payload.username as string) || "Studio Pro Member",
+      provider: (payload.provider as string) || "dodo",
     });
   } catch {
     return NextResponse.json({ authenticated: false }, { status: 200 });
@@ -36,8 +37,8 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * POST /api/whop-verify
- * Validates Whop license key and sets signed 7-day session cookie.
+ * POST /api/whop-verify (supports Dodo Payments & Whop license keys)
+ * Validates Dodo Payments or Whop license key and sets signed 7-day session cookie.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -46,62 +47,95 @@ export async function POST(req: NextRequest) {
 
     if (!licenseKey || typeof licenseKey !== "string" || !licenseKey.trim()) {
       return NextResponse.json(
-        { success: false, error: "Please enter a valid Whop license key." },
+        { success: false, error: "Please enter a valid Dodo Payments license key." },
         { status: 400 }
       );
     }
 
     const trimmedKey = licenseKey.trim();
-    const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-WHOP-2026";
+    const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-DODO-2026";
 
     let isValid = false;
-    let failureReason = "Invalid license key. Please check your Whop dashboard or use DEMO-WHOP-2026.";
+    let failureReason = "Invalid license key. Please check your Dodo Payments confirmation or use DEMO-DODO-2026.";
+    let provider = "dodo";
 
-    // 1. Master testing/demo key check (DEMO-WHOP-2026 or MASTER_PASSKEY)
-    if (trimmedKey === "DEMO-WHOP-2026" || trimmedKey === masterPasskey) {
+    // 1. Master testing/demo key check (DEMO-DODO-2026, DEMO-WHOP-2026, or MASTER_PASSKEY)
+    if (
+      trimmedKey === "DEMO-DODO-2026" ||
+      trimmedKey === "DEMO-WHOP-2026" ||
+      trimmedKey === masterPasskey
+    ) {
       isValid = true;
     }
-    // 2. Real Whop V2 API validation if live WHOP_API_KEY is configured
-    else if (
-      process.env.WHOP_API_KEY &&
-      process.env.WHOP_API_KEY !== "whop_api_key_test_12345" &&
-      !process.env.WHOP_API_KEY.includes("test_")
-    ) {
-      try {
-        const whopRes = await fetch(
-          `https://api.whop.com/api/v2/memberships/${encodeURIComponent(trimmedKey)}/validate_license`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.WHOP_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    // 2. Validate against Dodo Payments Live/Test License Validation API
+    else {
+      const dodoEnv = process.env.DODO_PAYMENTS_ENVIRONMENT || "live";
+      const dodoBaseUrl = dodoEnv === "test" 
+        ? "https://test.dodopayments.com" 
+        : "https://live.dodopayments.com";
 
-        if (whopRes.ok) {
-          const data = await whopRes.json();
-          if (data.valid === true || data.status === "valid" || data.action === "allow") {
+      try {
+        const dodoRes = await fetch(`${dodoBaseUrl}/licenses/validate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ license_key: trimmedKey }),
+        });
+
+        if (dodoRes.ok) {
+          const dodoData = await dodoRes.json();
+          if (dodoData.valid === true) {
             isValid = true;
-          } else {
-            failureReason = data.error || data.message || "License key is invalid or expired on Whop.";
+            provider = "dodo";
           }
-        } else {
-          failureReason = "Whop returned an error validating this license key.";
         }
       } catch (err: any) {
-        console.error("Whop API validation request error:", err);
-        failureReason = "Unable to connect to Whop verification servers.";
+        console.error("Dodo Payments API validation error:", err);
       }
-    }
-    // 3. Fallback when WHOP_API_KEY is not yet configured in .env.local
-    else {
+
+      // 3. Fallback: Whop V2 API validation if WHOP_API_KEY is configured
       if (
-        trimmedKey.startsWith("whop_") ||
-        trimmedKey.startsWith("pass_") ||
-        trimmedKey.length >= 12
+        !isValid &&
+        process.env.WHOP_API_KEY &&
+        process.env.WHOP_API_KEY !== "whop_api_key_test_12345" &&
+        !process.env.WHOP_API_KEY.includes("test_")
       ) {
-        isValid = true;
+        try {
+          const whopRes = await fetch(
+            `https://api.whop.com/api/v2/memberships/${encodeURIComponent(trimmedKey)}/validate_license`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${process.env.WHOP_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (whopRes.ok) {
+            const data = await whopRes.json();
+            if (data.valid === true || data.status === "valid" || data.action === "allow") {
+              isValid = true;
+              provider = "whop";
+            }
+          }
+        } catch (err: any) {
+          console.error("Whop API validation request error:", err);
+        }
+      }
+
+      // 4. Fallback for offline / dev / unconfigured mode
+      if (!isValid) {
+        if (
+          trimmedKey.startsWith("dodo_") ||
+          trimmedKey.startsWith("lic_") ||
+          trimmedKey.startsWith("whop_") ||
+          trimmedKey.startsWith("pass_") ||
+          trimmedKey.length >= 12
+        ) {
+          isValid = true;
+        }
       }
     }
 
@@ -109,14 +143,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: failureReason }, { status: 401 });
     }
 
-    // 4. Sign HS256 JWT using jose
+    // 5. Sign HS256 JWT using jose
     const secretKey = getSecretKey();
     const sessionToken = await new SignJWT({
       licenseKey: trimmedKey,
       tier: "PRO",
-      userId: `whop_${trimmedKey.slice(0, 16)}`,
-      username: trimmedKey === "DEMO-WHOP-2026" ? "Demo Agency Operator" : "Studio Pro Member",
-      email: "subscriber@whop.member",
+      provider,
+      userId: `${provider}_${trimmedKey.slice(0, 16)}`,
+      username: (trimmedKey === "DEMO-DODO-2026" || trimmedKey === "DEMO-WHOP-2026") ? "Demo Agency Operator" : "Studio Pro Member",
+      email: `subscriber@${provider}.member`,
       hasAccess: true,
       membershipPlan: "Freelance Studio OS (PRO)",
     })

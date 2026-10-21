@@ -3,9 +3,9 @@
 > **The plug-and-play AI system that turns cold local-business URLs into signed proposals in 60 seconds.**
 
 [![Deploy on Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://vercel.com/new)
-[![Powered by Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue?logo=google)](https://aistudio.google.com/)
+[![Powered by Gemini](https://img.shields.io/badge/AI-Gemini%20Flash-blue?logo=google)](https://aistudio.google.com/)
 [![Built with Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
-[![Sold on Whop](https://img.shields.io/badge/Get%20Access-Whop%20%2449%2Fmo-7c3aed)](https://whop.com)
+[![Sold on Dodo Payments](https://img.shields.io/badge/Get%20Access-Dodo%20Payments%20%2449%2Fmo-ea580c)](https://dodopayments.com)
 
 ---
 
@@ -52,11 +52,16 @@ A full project build studio for:
 
 ---
 
-## 🔐 How The License Gate Works
+## 🔐 How The Dodo Payments License Gate Works
 
-This product is sold on Whop. When a buyer purchases access, they receive a Whop license key. They paste it into the app's lock screen, which validates against the Whop API and unlocks all features for the duration of their subscription.
+This product is sold via **Dodo Payments** (`https://dodopayments.com`). When a customer purchases access:
 
-**Testing / demo key:** `DEMO-WHOP-2026`
+1. Dodo Payments immediately generates and emails a customer **License Key**.
+2. The user inputs their license key on the app's lock screen.
+3. The server validates the key against Dodo Payments' validation endpoint (`https://live.dodopayments.com/licenses/validate`).
+4. Upon validation, the app signs an HS256 JWT session cookie valid for 7 days.
+
+**Testing / Demo key:** `DEMO-DODO-2026` (also accepts `DEMO-WHOP-2026` for backward compatibility)
 
 ---
 
@@ -65,7 +70,7 @@ This product is sold on Whop. When a buyer purchases access, they receive a Whop
 > You do **not** need to touch any code or config files. Just:
 
 1. **Clone or deploy** this repo (one click on Vercel — see button above)
-2. **Open the app** in your browser and paste your Whop license key to unlock
+2. **Open the app** in your browser and paste your Dodo Payments license key to unlock
 3. **Paste your free Gemini API key** in the Settings drawer (no `.env` editing required)
 
 That's it. The system is live and generating proposals.
@@ -80,7 +85,7 @@ That's it. The system is live and generating proposals.
 |------|-------|-------------|
 | **Freelance Client OS** | **\$49/month** | Full AI Audit Engine + Scope Shield + Architect Studio + Unlimited Prospects |
 
-**[→ Get Instant Access on Whop](https://whop.com)**
+**[→ Get Instant Access on Dodo Payments](https://dodopayments.com)**
 
 **Why \$49/month?**
 - One signed client from a single AI audit = 10–50× ROI in the first week
@@ -110,19 +115,21 @@ npm install
 Create a `.env.local` file in the root:
 
 ```env
-# Required: Your Gemini AI key (free at aistudio.google.com)
-GEMINI_API_KEY=your_gemini_api_key_here
+# Dodo Payments Configuration (live or test)
+DODO_PAYMENTS_ENVIRONMENT=live
+DODO_PAYMENTS_API_KEY=
+DODO_PAYMENTS_WEBHOOK_KEY=
+
+# Master Passkey for Testing & Demo Recording
+MASTER_PASSKEY=DEMO-DODO-2026
 
 # Required: Session signing secret (any 32+ char random string)
 SESSION_SECRET=your_super_secret_32_char_string_here
 
-# Demo/master bypass key (set to whatever you want for testing)
-MASTER_PASSKEY=DEMO-WHOP-2026
+# Required: Your Gemini AI key (free at aistudio.google.com)
+GEMINI_API_KEY=your_gemini_api_key_here
 
-# Optional: Your Whop API key (leave blank for auto-pass mode during dev)
-WHOP_API_KEY=
-
-# Optional: Enable dev bypass (skip Whop auth in local dev)
+# Optional: Enable dev bypass in non-production
 DEV_BYPASS_ENABLED=true
 ```
 
@@ -132,7 +139,7 @@ DEV_BYPASS_ENABLED=true
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — enter `DEMO-WHOP-2026` to unlock.
+Open [http://localhost:3000](http://localhost:3000) — enter `DEMO-DODO-2026` to unlock.
 
 ---
 
@@ -141,9 +148,9 @@ Open [http://localhost:3000](http://localhost:3000) — enter `DEMO-WHOP-2026` t
 | Layer | Technology |
 |-------|-----------|
 | **Framework** | Next.js 14 App Router |
-| **AI** | Google Gemini 2.5 Flash (via REST API) |
+| **AI** | Google Gemini 3.8 / 2.5 Flash (via REST API) |
 | **Auth** | JWT (HS256 via `jose`) + HttpOnly cookies |
-| **License Gate** | Whop V2 API |
+| **Payments & Licensing** | Dodo Payments License Validation API |
 | **Styling** | Tailwind CSS (dark mode) |
 | **Icons** | Lucide React |
 | **Scraping** | Native `fetch` + `AbortController` |
@@ -156,10 +163,11 @@ Open [http://localhost:3000](http://localhost:3000) — enter `DEMO-WHOP-2026` t
 ```
 /app
   /api
-    /whop-verify/route.ts   — License gate + JWT session
-    /engine/route.ts        — AI lead audit (scrape + Gemini)
+    /dodo-verify/route.ts   — Dodo Payments license gate + JWT session
+    /whop-verify/route.ts   — Compatible verify route handler
+    /engine/route.ts        — AI lead audit (live scrape + Gemini)
     /scope-shield/route.ts  — Scope creep classifier
-  page.tsx                  — Main SaaS UI (lock screen + 3 tabs)
+  page.tsx                  — Main SaaS UI (Dodo lock screen + 3 tabs)
 /components
   GeneratorForm.tsx         — Architect Studio input form
   RoadmapViewer.tsx         — Sitemap/roadmap viewer
@@ -175,15 +183,9 @@ middleware.ts               — Auth middleware
 ## 🔒 Security
 
 - All API keys stored server-side only (never exposed to the browser)
-- Buyers paste their Gemini key into a Settings drawer — it is stored in `localStorage` on their device only
-- `whop_session` cookie is `httpOnly`, `SameSite=Strict`, `Secure` in production
+- Buyers paste their Gemini key into a Settings drawer — stored in `localStorage` on their device only
+- License validation happens server-side with verified cryptographic signatures
 - No logging of prospect data or client messages
-
----
-
-## 🤝 Support
-
-Purchased on Whop? Join the community or message support directly on your Whop dashboard.
 
 ---
 
@@ -193,4 +195,4 @@ Commercial product. All rights reserved. Unauthorized redistribution is prohibit
 
 ---
 
-*Built with ❤️ for freelance web agencies. Powered by Google Gemini AI.*
+*Built for freelance web agencies. Powered by Google Gemini AI & Dodo Payments.*

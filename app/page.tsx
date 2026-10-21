@@ -140,8 +140,8 @@ export default function FreelanceClientOSPage() {
       }
     }
 
-    // Check Whop session
-    fetch("/api/whop-verify")
+    // Check Dodo Payments / Whop session
+    fetch("/api/dodo-verify")
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
@@ -174,7 +174,7 @@ export default function FreelanceClientOSPage() {
     setLicenseError("");
 
     try {
-      const res = await fetch("/api/whop-verify", {
+      const res = await fetch("/api/dodo-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ licenseKey: keyToTest.trim() }),
@@ -196,7 +196,7 @@ export default function FreelanceClientOSPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/whop-verify", { method: "DELETE" });
+      await fetch("/api/dodo-verify", { method: "DELETE" });
     } finally {
       setIsUnlocked(false);
       setLicenseInput("");
@@ -317,7 +317,7 @@ export default function FreelanceClientOSPage() {
             <RefreshCw className="h-5 w-5" />
           </div>
           <span className="text-sm font-medium tracking-wide text-slate-400">
-            Checking Whop license entitlement...
+            Checking Dodo Payments license...
           </span>
         </div>
       </div>
@@ -325,30 +325,30 @@ export default function FreelanceClientOSPage() {
   }
 
   // -------------------------------------------------------------
-  // 2. RENDER WHOP LICENSE LOCK SCREEN (If Not Unlocked)
+  // 2. RENDER DODO PAYMENTS LICENSE LOCK SCREEN (If Not Unlocked)
   // -------------------------------------------------------------
   if (!isUnlocked) {
     return (
       <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white relative overflow-hidden">
         {/* Ambient Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-indigo-600/20 via-violet-600/5 to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-orange-600/20 via-indigo-600/5 to-transparent blur-3xl pointer-events-none" />
 
         {/* Minimal Header */}
         <header className="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md px-6 py-4 flex items-center justify-between z-10">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-orange-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-orange-500/30">
               <Zap className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-sm tracking-tight text-white">Freelance Client OS</span>
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                WHOP EDITION
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/25">
+                DODO EDITION
               </span>
             </div>
           </div>
 
           <a
-            href="https://whop.com/hub/freelance-client-os/"
+            href="https://dodopayments.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
@@ -361,13 +361,13 @@ export default function FreelanceClientOSPage() {
         {/* Lock Screen Body */}
         <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 z-10 max-w-lg mx-auto w-full">
           <div className="w-full bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
-            <div className="h-12 w-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto mb-4">
+            <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 mx-auto mb-4">
               <Lock className="h-6 w-6" />
             </div>
 
             <div className="text-center space-y-1.5 mb-6">
               <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-                Enter Your Whop License Key
+                Enter Your Dodo Payments License Key
               </h2>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Unlock instant access to the AI Prospect Website Auditor, 3-Tier Proposal Closer, and Scope Creep Shield.
@@ -380,7 +380,7 @@ export default function FreelanceClientOSPage() {
             <form onSubmit={(e) => handleVerifyLicense(e)} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Whop Membership License Key
+                  Dodo Payments License Key
                 </label>
                 <div className="relative">
                   <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
@@ -391,8 +391,8 @@ export default function FreelanceClientOSPage() {
                       setLicenseInput(e.target.value);
                       if (licenseError) setLicenseError("");
                     }}
-                    placeholder="whop_mem_... or DEMO-WHOP-2026"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
+                    placeholder="dodo_lic_... or DEMO-DODO-2026"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
                   />
                 </div>
                 {licenseError && (
@@ -406,12 +406,12 @@ export default function FreelanceClientOSPage() {
               <button
                 type="submit"
                 disabled={isVerifying}
-                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-orange-500 via-amber-600 to-indigo-600 hover:from-orange-600 hover:to-indigo-700 text-white shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {isVerifying ? (
                   <>
                     <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                    <span>Validating with Whop...</span>
+                    <span>Validating with Dodo Payments...</span>
                   </>
                 ) : (
                   <>
@@ -427,15 +427,15 @@ export default function FreelanceClientOSPage() {
               <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
                 <div className="text-[11px] text-slate-400">
                   <span className="font-semibold text-slate-300 block">Demo & Video Recording Pass:</span>
-                  <code className="text-indigo-400 font-mono text-[10px]">DEMO-WHOP-2026</code>
+                  <code className="text-orange-400 font-mono text-[10px]">DEMO-DODO-2026</code>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
-                    setLicenseInput("DEMO-WHOP-2026");
-                    handleVerifyLicense(undefined, "DEMO-WHOP-2026");
+                    setLicenseInput("DEMO-DODO-2026");
+                    handleVerifyLicense(undefined, "DEMO-DODO-2026");
                   }}
-                  className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 transition-colors whitespace-nowrap"
+                  className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/25 transition-colors whitespace-nowrap"
                 >
                   Quick Unlock →
                 </button>
@@ -444,12 +444,12 @@ export default function FreelanceClientOSPage() {
 
             <div className="mt-4 text-center">
               <a
-                href="https://whop.com/hub/freelance-client-os/"
+                href="https://dodopayments.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] text-slate-400 hover:text-indigo-400 font-medium transition-colors"
+                className="text-[11px] text-slate-400 hover:text-orange-400 font-medium transition-colors"
               >
-                Don&apos;t have a license yet? Get Instant Access — \$49/mo on Whop →
+                Don&apos;t have a license yet? Get Instant Access — \$49/mo on Dodo Payments →
               </a>
             </div>
           </div>
@@ -481,7 +481,7 @@ export default function FreelanceClientOSPage() {
                 </span>
               </div>
               <span className="text-[10px] text-slate-400 block -mt-0.5">
-                {agencyName} • Whop Edition
+                {agencyName} • Dodo Payments Edition
               </span>
             </div>
           </div>
