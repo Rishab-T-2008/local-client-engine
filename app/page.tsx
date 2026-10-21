@@ -348,12 +348,12 @@ export default function FreelanceClientOSPage() {
           </div>
 
           <a
-            href="https://whop.com"
+            href="https://whop.com/hub/freelance-client-os/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
           >
-            <span>Whop Marketplace</span>
+            <span>Get Access — \$49/mo</span>
             <ExternalLink className="h-3 w-3" />
           </a>
         </header>
@@ -371,6 +371,9 @@ export default function FreelanceClientOSPage() {
               </h2>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Unlock instant access to the AI Prospect Website Auditor, 3-Tier Proposal Closer, and Scope Creep Shield.
+              </p>
+              <p className="text-[11px] text-emerald-400/80 font-semibold mt-1">
+                One signed client = 10× your \$49/mo investment.
               </p>
             </div>
 
@@ -441,12 +444,12 @@ export default function FreelanceClientOSPage() {
 
             <div className="mt-4 text-center">
               <a
-                href="https://whop.com"
+                href="https://whop.com/hub/freelance-client-os/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] text-slate-400 hover:text-indigo-400 font-medium transition-colors"
               >
-                Don&apos;t have a Whop license yet? Get Instant Access on Whop →
+                Don&apos;t have a license yet? Get Instant Access — \$49/mo on Whop →
               </a>
             </div>
           </div>
