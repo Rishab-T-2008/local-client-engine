@@ -340,7 +340,7 @@ export default function FreelanceClientOSPage() {
               <Zap className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-tight text-white">Freelance Client OS</span>
+              <span className="font-bold text-sm tracking-tight text-white">ClientCloser AI</span>
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/25">
                 DODO EDITION
               </span>
@@ -416,7 +416,7 @@ export default function FreelanceClientOSPage() {
                 ) : (
                   <>
                     <Unlock className="h-3.5 w-3.5" />
-                    <span>Unlock Freelance Studio OS</span>
+                    <span>Unlock ClientCloser AI</span>
                   </>
                 )}
               </button>
@@ -474,7 +474,7 @@ export default function FreelanceClientOSPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-sm sm:text-base text-white tracking-tight">
-                  Freelance Client OS
+                  ClientCloser AI
                 </span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                   {sessionTier} ACTIVE
@@ -1393,7 +1393,7 @@ export default function FreelanceClientOSPage() {
                 <Sliders className="h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Freelance Studio OS Settings</h3>
+                <h3 className="text-sm font-bold text-white">ClientCloser AI Settings</h3>
                 <span className="text-[11px] text-slate-400">Zero-code browser storage (no .env required)</span>
               </div>
             </div>

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Local Client Engine | High-Converting Pitch & Roadmap Generator",
-  description: "Build & sell $1,500 local business websites in under 2 hours. Generate custom AI system prompts, 5-page roadmaps, and 3-tier closing scripts for cafes, clinics, salons, and local services.",
-  keywords: ["Whop SaaS", "Local Business Websites", "Agency Prompts", "Freelance Web Dev", "Client Pitch Scripts"],
+  title: "ClientCloser AI — Autonomous Agency OS & Proposal Engine",
+  description: "Turn cold prospect websites into closed $3,000+ retainers. Instant CRO site audits, 3-tier proposals, cold outreach packages, and AI scope creep shields.",
+  keywords: ["ClientCloser AI", "Agency Operating System", "AI Proposal Generator", "CRO Site Audit", "Freelance Closing Tool", "Scope Creep Shield"],
 };
 
 export default function RootLayout({

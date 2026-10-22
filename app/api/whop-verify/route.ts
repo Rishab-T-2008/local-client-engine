@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
       username: (trimmedKey === "DEMO-DODO-2026" || trimmedKey === "DEMO-WHOP-2026") ? "Demo Agency Operator" : "Studio Pro Member",
       email: `subscriber@${provider}.member`,
       hasAccess: true,
-      membershipPlan: "Freelance Studio OS (PRO)",
+      membershipPlan: "ClientCloser AI (PRO)",
     })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       success: true,
       licenseKey: trimmedKey,
       tier: "PRO",
-      message: "License verified successfully! Access granted to Freelance Studio OS.",
+      message: "License verified successfully! Access granted to ClientCloser AI.",
     });
 
     response.cookies.set(SESSION_COOKIE_NAME, sessionToken, {

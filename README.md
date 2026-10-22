@@ -1,6 +1,6 @@
-# 🚀 Freelance Client OS — AI Agency Operating System
+# 🚀 ClientCloser AI — Autonomous Agency OS & Proposal Engine
 
-> **The plug-and-play AI system that turns cold local-business URLs into signed proposals in 60 seconds.**
+> **The plug-and-play AI system that turns cold local-business URLs into signed $3,000 proposals in 60 seconds.**
 
 [![Deploy on Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://vercel.com/new)
 [![Powered by Gemini](https://img.shields.io/badge/AI-Gemini%20Flash-blue?logo=google)](https://aistudio.google.com/)
@@ -83,7 +83,7 @@ That's it. The system is live and generating proposals.
 
 | Plan | Price | What You Get |
 |------|-------|-------------|
-| **Freelance Client OS** | **\$49/month** | Full AI Audit Engine + Scope Shield + Architect Studio + Unlimited Prospects |
+| **ClientCloser AI** | **\$49/month** | Full AI Audit Engine + Scope Shield + Architect Studio + Unlimited Prospects |
 
 **[→ Get Instant Access on Dodo Payments](https://dodopayments.com)**
 
