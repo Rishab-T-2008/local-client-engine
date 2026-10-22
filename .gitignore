@@ -5,6 +5,7 @@
 
 # Production and build outputs
 /.next/
+/.open-next/
 /out/
 /build
 /dist
