@@ -68,19 +68,35 @@ async function scrapeWebsite(rawUrl?: string): Promise<{
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"macOS"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
       },
     });
 
     clearTimeout(timeoutId);
 
     if (!res.ok) {
+      let metaFallback = { title: "", description: "" };
+      try {
+        const errorHtml = await res.text();
+        metaFallback = cleanHtml(errorHtml);
+      } catch {}
+
       return {
         success: false,
-        title: "",
-        description: "",
-        textContent: `Prospect site returned HTTP ${res.status}. Analyzing based on prospect brand and niche benchmarks.`,
+        title: metaFallback.title || "",
+        description: metaFallback.description || "",
+        textContent: "Site blocked automated scraping — please paste text manually.",
         error: `HTTP ${res.status}`,
       };
     }
@@ -92,7 +108,7 @@ async function scrapeWebsite(rawUrl?: string): Promise<{
       success: true,
       title,
       description,
-      textContent: textContent || "Website returned empty HTML markup or renders purely client-side.",
+      textContent: textContent || "Site blocked automated scraping — please paste text manually.",
     };
   } catch (err: any) {
     clearTimeout(timeoutId);
@@ -100,7 +116,7 @@ async function scrapeWebsite(rawUrl?: string): Promise<{
       success: false,
       title: "",
       description: "",
-      textContent: "Prospect website was unreachable, timed out, or blocked automated inspection. Analyzing using target niche conversion standards.",
+      textContent: "Site blocked automated scraping — please paste text manually.",
       error: err.name === "AbortError" ? "Timeout after 6s" : err.message,
     };
   }

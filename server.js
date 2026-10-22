@@ -1675,6 +1675,54 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // POST /api/webhook/dodo
+  if (pathname === "/api/webhook/dodo" && req.method === "POST") {
+    const webhookSecret = process.env.DODO_PAYMENTS_WEBHOOK_KEY || process.env.WEBHOOK_SECRET;
+    let body = "";
+    req.on("data", chunk => { body += chunk; });
+    req.on("end", () => {
+      const webhookId = req.headers["webhook-id"];
+      const webhookTimestamp = req.headers["webhook-timestamp"];
+      const webhookSignature = req.headers["webhook-signature"];
+
+      if (webhookSecret) {
+        if (!webhookId || !webhookTimestamp || !webhookSignature) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing required Dodo webhook signature headers" }));
+          return;
+        }
+        let secretKey = webhookSecret.trim();
+        if (secretKey.startsWith("whsec_")) secretKey = secretKey.substring(6);
+        let secretBuffer = Buffer.from(secretKey, "base64");
+        if (secretBuffer.length === 0) secretBuffer = Buffer.from(secretKey, "utf8");
+
+        const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
+        const computedHmacBuffer = crypto.createHmac("sha256", secretBuffer).update(signedContent, "utf8").digest();
+        const signatures = webhookSignature.split(" ");
+        let valid = false;
+        for (const sig of signatures) {
+          const [version, encodedSig] = sig.split(",");
+          if (version === "v1" && encodedSig) {
+            const receivedBuffer = Buffer.from(encodedSig, "base64");
+            if (computedHmacBuffer.length === receivedBuffer.length && crypto.timingSafeEqual(computedHmacBuffer, receivedBuffer)) {
+              valid = true;
+              break;
+            }
+          }
+        }
+        if (!valid) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Invalid webhook signature" }));
+          return;
+        }
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ received: true }));
+    });
+    return;
+  }
+
   // POST /api/webhook/whop
   if (pathname === "/api/webhook/whop" && req.method === "POST") {
     const secret = process.env.WHOP_WEBHOOK_SECRET;
