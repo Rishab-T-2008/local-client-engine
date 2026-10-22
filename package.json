@@ -7,6 +7,7 @@
     "build": "next build",
     "deploy": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && npx wrangler deploy"
 
+
     "preview": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "next lint"
