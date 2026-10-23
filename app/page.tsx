@@ -125,7 +125,12 @@ export default function FreelanceClientOSPage() {
   useEffect(() => {
     // Load local storage preferences
     if (typeof window !== "undefined") {
-      const storedKey = localStorage.getItem("f_os_gemini_key") || "";
+      let storedKey = localStorage.getItem("f_os_gemini_key") || "";
+      // Purge revoked/deprecated test keys automatically
+      if (storedKey.endsWith("ML1uJQ") || (storedKey && storedKey.length < 20)) {
+        localStorage.removeItem("f_os_gemini_key");
+        storedKey = "";
+      }
       const storedAgency = localStorage.getItem("f_os_agency_name") || "Apex Web Studio";
       const storedRate = localStorage.getItem("f_os_hourly_rate");
 

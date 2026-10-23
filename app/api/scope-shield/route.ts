@@ -26,8 +26,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const apiKey = (customApiKey && customApiKey.trim()) || process.env.GEMINI_API_KEY;
-    if (!apiKey || typeof apiKey !== "string" || !apiKey.trim()) {
+    const candidateKeys: string[] = [];
+    if (customApiKey && customApiKey.trim()) {
+      candidateKeys.push(customApiKey.trim());
+    }
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim()) {
+      const serverKey = process.env.GEMINI_API_KEY.trim();
+      if (!candidateKeys.includes(serverKey)) {
+        candidateKeys.push(serverKey);
+      }
+    }
+
+    if (candidateKeys.length === 0) {
       return NextResponse.json(
         {
           error:
@@ -75,7 +85,7 @@ Respond with strict JSON following this schema:
   "diplomaticReply": "string (ready-to-send copy/paste message)"
 }`;
 
-    // Call Gemini REST API (with gemini-3.5-flash-lite & multi-model fallback)
+    // Call Gemini REST API (with candidate keys & multi-model fallback)
     const models = [
       "gemini-3.5-flash-lite",
       "gemini-3-flash-preview",
@@ -85,50 +95,54 @@ Respond with strict JSON following this schema:
     let geminiData: any = null;
     let lastErrorMsg = "Gemini API error.";
 
-    for (const model of models) {
-      try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
-          apiKey.trim()
-        )}`;
-
-        const geminiRes = await fetch(geminiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }],
-              },
-            ],
-            generationConfig: {
-              responseMimeType: "application/json",
-              temperature: 0.3,
-            },
-          }),
-        });
-
-        if (geminiRes.ok) {
-          geminiData = await geminiRes.json();
-          break;
-        }
-
-        const errorText = await geminiRes.text();
+    keyLoop: for (const apiKey of candidateKeys) {
+      for (const model of models) {
         try {
-          const parsed = JSON.parse(errorText);
-          lastErrorMsg = parsed.error?.message || lastErrorMsg;
-        } catch {}
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+            apiKey.trim()
+          )}`;
 
-        // If model not found (404), overloaded (503), rate limited (429), or server error (500+), try next fallback model
-        if (geminiRes.status === 404 || geminiRes.status === 429 || geminiRes.status >= 500) {
+          const geminiRes = await fetch(geminiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: prompt }],
+                },
+              ],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.3,
+              },
+            }),
+          });
+
+          if (geminiRes.ok) {
+            geminiData = await geminiRes.json();
+            break keyLoop;
+          }
+
+          const errorText = await geminiRes.text();
+          try {
+            const parsed = JSON.parse(errorText);
+            lastErrorMsg = parsed.error?.message || lastErrorMsg;
+          } catch {}
+
+          // If client key is invalid (400), break model loop to try server fallback key
+          if (geminiRes.status === 400) {
+            break;
+          }
+
+          // If model not found (404), overloaded (503), rate limited (429), or server error (500+), try next fallback model
+          if (geminiRes.status === 404 || geminiRes.status === 429 || geminiRes.status >= 500) {
+            continue;
+          }
+        } catch (fetchErr: any) {
+          lastErrorMsg = fetchErr.message || "Network error connecting to Gemini API.";
           continue;
         }
-
-        // For fatal client errors (e.g. 400 invalid API key), return immediately
-        return NextResponse.json({ error: `Gemini API error: ${lastErrorMsg}` }, { status: geminiRes.status });
-      } catch (fetchErr: any) {
-        lastErrorMsg = fetchErr.message || "Network error connecting to Gemini API.";
-        continue;
       }
     }
 
