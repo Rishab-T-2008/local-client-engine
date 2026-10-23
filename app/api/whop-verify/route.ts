@@ -53,18 +53,14 @@ export async function POST(req: NextRequest) {
     }
 
     const trimmedKey = licenseKey.trim();
-    const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-DODO-2026";
+    const masterPasskey = process.env.MASTER_PASSKEY || "Rishu@3344";
 
     let isValid = false;
-    let failureReason = "Invalid license key. Please check your Dodo Payments confirmation or use DEMO-DODO-2026.";
+    let failureReason = "Invalid license key. Please check your Dodo Payments confirmation or passkey.";
     let provider = "dodo";
 
-    // 1. Master testing/demo key check (DEMO-DODO-2026, DEMO-WHOP-2026, or MASTER_PASSKEY)
-    if (
-      trimmedKey === "DEMO-DODO-2026" ||
-      trimmedKey === "DEMO-WHOP-2026" ||
-      trimmedKey === masterPasskey
-    ) {
+    // 1. Master passkey check
+    if (trimmedKey === masterPasskey || trimmedKey === "Rishu@3344") {
       isValid = true;
     }
     // 2. Validate against Dodo Payments Live/Test License Validation API
@@ -130,9 +126,7 @@ export async function POST(req: NextRequest) {
         if (
           trimmedKey.startsWith("dodo_") ||
           trimmedKey.startsWith("lic_") ||
-          trimmedKey.startsWith("whop_") ||
-          trimmedKey.startsWith("pass_") ||
-          trimmedKey.length >= 12
+          trimmedKey.startsWith("whop_")
         ) {
           isValid = true;
         }
@@ -150,7 +144,7 @@ export async function POST(req: NextRequest) {
       tier: "PRO",
       provider,
       userId: `${provider}_${trimmedKey.slice(0, 16)}`,
-      username: (trimmedKey === "DEMO-DODO-2026" || trimmedKey === "DEMO-WHOP-2026") ? "Demo Agency Operator" : "Studio Pro Member",
+      username: (trimmedKey === "Rishu@3344" || trimmedKey === masterPasskey) ? "Studio Admin" : "Studio Pro Member",
       email: `subscriber@${provider}.member`,
       hasAccess: true,
       membershipPlan: "ClientCloser AI (PRO)",

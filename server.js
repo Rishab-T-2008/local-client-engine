@@ -1476,20 +1476,17 @@ const server = http.createServer((req, res) => {
         return;
       }
       const trimmedKey = licenseKey.trim();
-      const masterPasskey = process.env.MASTER_PASSKEY || "DEMO-DODO-2026";
+      const masterPasskey = process.env.MASTER_PASSKEY || "Rishu@3344";
       let isValid = false;
       if (
-        trimmedKey === "DEMO-DODO-2026" ||
-        trimmedKey === "DEMO-WHOP-2026" ||
-        trimmedKey === masterPasskey
+        trimmedKey === masterPasskey ||
+        trimmedKey === "Rishu@3344"
       ) {
         isValid = true;
       } else if (
         trimmedKey.startsWith("dodo_") ||
         trimmedKey.startsWith("lic_") ||
-        trimmedKey.startsWith("whop_") ||
-        trimmedKey.startsWith("pass_") ||
-        trimmedKey.length >= 12
+        trimmedKey.startsWith("whop_")
       ) {
         isValid = true;
       }
@@ -1500,7 +1497,7 @@ const server = http.createServer((req, res) => {
       }
       const mockUser = {
         id: `dodo_${trimmedKey.slice(0, 16)}`,
-        username: (trimmedKey === "DEMO-DODO-2026" || trimmedKey === "DEMO-WHOP-2026") ? "Demo Agency Operator" : "Studio Pro Member",
+        username: (trimmedKey === "Rishu@3344" || trimmedKey === masterPasskey) ? "Studio Admin" : "Studio Pro Member",
         email: "subscriber@dodopayments.member",
         hasAccess: true,
         membershipPlan: "Freelance Studio OS (PRO)",

@@ -396,7 +396,7 @@ export default function FreelanceClientOSPage() {
                       setLicenseInput(e.target.value);
                       if (licenseError) setLicenseError("");
                     }}
-                    placeholder="dodo_lic_... or DEMO-DODO-2026"
+                    placeholder="Enter license key or passkey"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
                   />
                 </div>
@@ -427,27 +427,7 @@ export default function FreelanceClientOSPage() {
               </button>
             </form>
 
-            {/* Instant Demo Test Helper */}
-            <div className="mt-6 pt-5 border-t border-slate-800/80">
-              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
-                <div className="text-[11px] text-slate-400">
-                  <span className="font-semibold text-slate-300 block">Demo & Video Recording Pass:</span>
-                  <code className="text-orange-400 font-mono text-[10px]">DEMO-DODO-2026</code>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLicenseInput("DEMO-DODO-2026");
-                    handleVerifyLicense(undefined, "DEMO-DODO-2026");
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/25 transition-colors whitespace-nowrap"
-                >
-                  Quick Unlock →
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-4 text-center">
+            <div className="mt-6 text-center">
               <a
                 href="https://dodopayments.com"
                 target="_blank"
