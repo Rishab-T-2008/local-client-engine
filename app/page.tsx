@@ -127,7 +127,11 @@ export default function FreelanceClientOSPage() {
     if (typeof window !== "undefined") {
       let storedKey = localStorage.getItem("f_os_gemini_key") || "";
       // Purge revoked/deprecated test keys automatically
-      if (storedKey.endsWith("ML1uJQ") || (storedKey && storedKey.length < 20)) {
+      if (
+        storedKey.endsWith("ML1uJQ") ||
+        (storedKey && storedKey.length < 20) ||
+        (storedKey && !storedKey.startsWith("AQ.") && !storedKey.startsWith("AIzaSy"))
+      ) {
         localStorage.removeItem("f_os_gemini_key");
         storedKey = "";
       }
@@ -1436,7 +1440,7 @@ export default function FreelanceClientOSPage() {
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">
-                  Powers the live website scraper, CRO audit, and scope defense engines. Saved securely in your browser&apos;s localStorage.
+                  Optional. Built-in Gemini AI is active by default. Enter a custom key only if you wish to use your own personal API quota.
                 </p>
               </div>
 
