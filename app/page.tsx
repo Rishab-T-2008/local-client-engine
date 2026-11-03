@@ -320,15 +320,64 @@ export default function FreelanceClientOSPage() {
   // -------------------------------------------------------------
   if (isUnlocked === null) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-300">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 animate-spin">
-            <RefreshCw className="h-5 w-5" />
+      <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white relative overflow-hidden">
+        <header className="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md px-6 py-4 flex items-center justify-between z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-orange-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-orange-500/30">
+              <Zap className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm tracking-tight text-white">ClientCloser AI</span>
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/25">
+                PRO EDITION
+              </span>
+            </div>
           </div>
-          <span className="text-sm font-medium tracking-wide text-slate-400">
-            Verifying workspace license...
-          </span>
-        </div>
+          <div className="flex items-center gap-5 text-xs font-medium text-slate-400">
+            <a
+              href="https://whop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <span>Get License</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center justify-center p-4 text-slate-300">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 animate-spin">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <span className="text-sm font-medium tracking-wide text-slate-400">
+              Loading workspace...
+            </span>
+          </div>
+        </main>
+
+        <footer className="border-t border-slate-800/60 bg-slate-950/60 py-4 px-6 z-10 text-xs text-slate-500">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div>
+              © 2026 ClientCloser AI. Autonomous Agency OS & Proposal Engine.
+            </div>
+            <div className="flex items-center gap-5 text-slate-400">
+              <a
+                href="https://whop.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-slate-200 transition-colors"
+              >
+                Product Store
+              </a>
+              <span className="text-slate-700">•</span>
+              <span className="text-slate-500">Terms of Service</span>
+              <span className="text-slate-700">•</span>
+              <span className="text-slate-500">Privacy Policy</span>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
