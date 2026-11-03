@@ -17,6 +17,7 @@
 .env*.local
 .env.production
 .env.staging
+.dev.vars
 
 # Scratch / test files
 /scratch
