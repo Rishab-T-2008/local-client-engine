@@ -326,7 +326,7 @@ export default function FreelanceClientOSPage() {
             <RefreshCw className="h-5 w-5" />
           </div>
           <span className="text-sm font-medium tracking-wide text-slate-400">
-            Checking Dodo Payments license...
+            Verifying workspace license...
           </span>
         </div>
       </div>
@@ -488,7 +488,7 @@ export default function FreelanceClientOSPage() {
                 </span>
               </div>
               <span className="text-[10px] text-slate-400 block -mt-0.5">
-                {agencyName} • Dodo Payments Edition
+                {agencyName} • Pro Operating System
               </span>
             </div>
           </div>
