@@ -356,11 +356,16 @@ export default function FreelanceClientOSPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Encrypted Access</span>
-            </span>
+          <div className="flex items-center gap-5 text-xs font-medium text-slate-400">
+            <a
+              href="https://whop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <span>Get License</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         </header>
 
@@ -376,7 +381,7 @@ export default function FreelanceClientOSPage() {
                 Activate ClientCloser AI Workspace
               </h2>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Enter your product license key or passkey to unlock the Autonomous Lead Auditor, 3-Tier Proposal Closer, and Scope Creep Shield.
+                Enter your product license key to unlock the Autonomous Lead Auditor, 3-Tier Proposal Closer, and Scope Creep Shield.
               </p>
               <p className="text-[11px] text-emerald-400/80 font-semibold mt-1">
                 One signed client = 10× your investment.
@@ -397,7 +402,7 @@ export default function FreelanceClientOSPage() {
                       setLicenseInput(e.target.value);
                       if (licenseError) setLicenseError("");
                     }}
-                    placeholder="Enter your license key or passkey"
+                    placeholder="Enter your license key"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
                   />
                 </div>
@@ -428,15 +433,34 @@ export default function FreelanceClientOSPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-5 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>256-Bit SSL Protection</span>
-              </span>
-              <span>ClientCloser AI © 2026</span>
+            <div className="mt-6 pt-5 border-t border-slate-800/60 text-center text-[11px] text-slate-400">
+              <span>Need help? Check your email confirmation for your license key.</span>
             </div>
           </div>
         </main>
+
+        {/* Public Footer */}
+        <footer className="border-t border-slate-800/60 bg-slate-950/60 py-4 px-6 z-10 text-xs text-slate-500">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div>
+              © 2026 ClientCloser AI. Autonomous Agency OS & Proposal Engine.
+            </div>
+            <div className="flex items-center gap-5 text-slate-400">
+              <a
+                href="https://whop.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-slate-200 transition-colors"
+              >
+                Product Store
+              </a>
+              <span className="text-slate-700">•</span>
+              <span className="text-slate-500">Terms of Service</span>
+              <span className="text-slate-700">•</span>
+              <span className="text-slate-500">Privacy Policy</span>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
